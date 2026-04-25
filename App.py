@@ -1,6 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 from PIL import Image  # Librería para manejar imágenes en Python
+import numpy as np
 
 # --- CONFIGURACIÓN INICIAL ---
 # st.secrets['GOOGLE_API_KEY'] busca la llave que guardamos en el Setting de Streamlit Cloud.
@@ -35,6 +36,12 @@ if option == 'Imagen (Contador)':
       image = Image.open(uploaded_file)
       # st.image la muestra en la pantalla de la app
       st.image(image, caption='Imagen cargada', use_column_width=True)
+
+      image_array = np.array(image)
+      with st.expander("📊 Datos Técnicos de la Matriz (Señal Visual)"):
+        st.write(f"Dimensiones de la matriz (Píxeles): {image_array.shape}")
+        st.write(f"Valor Máximo de Intensidad: {image_array.max()}")
+        st.write(f"Valor Mínimo de Intensidad: {image_array.min()}")
       
       
       # ---  EL BOTÓN DE ACCIÓN ---
@@ -69,6 +76,21 @@ elif option == 'Audio (Transcripción)':
     
     if uploaded_audio:
         st.audio(uploaded_audio)
+        # Datos del audio
+        with st.expander("📊 Datos de la Señal de Entrada del Audio"):
+            st.write(f"Formato: {uploaded_audio.type}")
+            st.write(f"Tamaño: {uploaded_audio.size / 1024:.2f} KB")
+
+        
+        #col1, col2 = st.columns(2)
+        #with col1:
+        #    st.metric("Formato", uploaded_audio.type)
+        #with col2:
+        #    st.metric("Tamaño", f"{uploaded_audio.size / 1024:.2f} KB")
+            
+        # Explicación técnica para el taller:
+        st.caption("Nota: La señal se digitaliza y se envía como un flujo de bytes codificados en Base64 hacia los tensores del modelo Gemini.")
+
         
         if st.button("Escuchar y Transcribir"):
             with st.spinner("La IA está escuchando..."):
